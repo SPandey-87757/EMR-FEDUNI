@@ -66,5 +66,25 @@ namespace EMRSimulation.Application.Services
         Task<int> DeleteFoodIntakeAsync(int id);
         Task<int> UpdateFoodIntakeAsync(FoodIntakeDto dto);
 
+        //Fluid balance chart
+        Task<FluidBalanceChartDto> GetFluidBalanceChartByIdAsync(int Id, int labId);
+        Task<IEnumerable<FluidBalanceChartDto>> GetFluidBalanceChartAsync(int labId, int patientId);
+        Task<IEnumerable<FluidBalanceAdministrationDto>> GetFluidBalanceAdministrationAsync(int labId, int patientId, int fluidBalanceChartId);
+        Task<int> AddPatientFluidBalanceAdministrationAsync(FluidBalanceAdministrationDto addsDto);
+        Task<(int id, string resultMessage)> DeleteFluidBalanceChartAsync(int Id);
+        Task<int> DeleteFluidBalanceAdministrationAsync(int Id);
+        Task<int> AddFluidBalanceChartsync(FluidBalanceChartDto addsDto);
+
+        
+        //Neurological chart
+        Task<NeurologicalChartDto> GetNeurologicalChartByIdAsync(int Id, int labId);
+        Task<IEnumerable<NeurologicalChartDto>> GetNeurologicalChartAsync(int labId, int patientId);
+        Task<IEnumerable<NeurologicalAdministrationDto>> GetNeurologicalAdministrationAsync(int labId, int patientId, int neurologicalChartId);
+        Task<int> AddPatientNeurologicalAdministrationAsync(NeurologicalAdministrationDto addsDto);
+        Task<(int id, string resultMessage)> DeleteNeurologicalChartAsync(int Id);
+        Task<int> DeleteNeurologicalAdministrationAsync(int Id);
+        Task<int> AddNeurologicalChartsync(NeurologicalChartDto addsDto);
+
+
     }
 }
