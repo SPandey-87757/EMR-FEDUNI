@@ -95,6 +95,116 @@ namespace EMRSimulation.WebApp.Controllers
             return Ok(result);
         }
 
+
+//update neurological and fluid 
+        public async Task<IActionResult> GetPatientFluidBalanceChartList(int labId, int patientId)
+        {
+            PatientFluidBalanceChartViewModel patientFluidBalanceChartViewModel = new PatientFluidBalanceChartViewModel();
+
+            IEnumerable<FluidBalanceChartDto> lstFluidBalanceChartDto;
+
+            lstFluidBalanceChartDto = await _patientService.GetFluidBalanceChartAsync(labId, patientId);
+            patientFluidBalanceChartViewModel.FluidBalanceChartDtoList = lstFluidBalanceChartDto;
+
+
+            return PartialView("~/views/patient/_patientFluidBalanceChartList.cshtml", patientFluidBalanceChartViewModel);
+        }
+
+
+        public async Task<IActionResult> GetPatientFluidBalanceChart(int Id, int labId, int patientId)
+        {
+            PatientDto patient;
+            patient = await _patientService.GetPatientById(patientId, labId);
+
+            PatientFluidBalanceChartViewModel patientFluidBalanceChartViewModel = new PatientFluidBalanceChartViewModel();
+            patientFluidBalanceChartViewModel.patientDto = patient;
+
+            FluidBalanceChartDto lstFluidBalanceChartDto;
+
+            lstFluidBalanceChartDto = await _patientService.GetFluidBalanceChartByIdAsync(Id, labId);
+            patientFluidBalanceChartViewModel.FluidBalanceChartDto = lstFluidBalanceChartDto;
+
+            return PartialView("~/views/patient/_patientFluidBalanceChart.cshtml", patientFluidBalanceChartViewModel);
+        }
+
+
+        public async Task<IActionResult> AddPatientFluidBalanceAdministration([FromBody] FluidBalanceAdministrationDto addsDto)
+        {
+            int result = await _patientService.AddPatientFluidBalanceAdministrationAsync(addsDto);
+            return Ok(result);
+        }
+
+        public async Task<IActionResult> GetFluidBalanceAdministration(int labId, int patientId, int fluidBalanceChartId)
+        {
+            IEnumerable<FluidBalanceAdministrationDto> lstPatients;
+
+            lstPatients = await _patientService.GetFluidBalanceAdministrationAsync(labId, patientId, fluidBalanceChartId);
+
+            return PartialView("~/views/patient/_patientFluidBalanceChartAdminList.cshtml", lstPatients);
+        }
+
+        public async Task<IActionResult> DeleteFluidBalanceAdministration(int Id)
+        {
+            int result = await _patientService.DeleteFluidBalanceAdministrationAsync(Id);
+            return Ok(result);
+        }
+
+
+
+        public async Task<IActionResult> GetPatientNeurologicalChartList(int labId, int patientId)
+        {
+            PatientNeurologicalChartViewModel patientNeurologicalChartViewModel = new PatientNeurologicalChartViewModel();
+
+            IEnumerable<NeurologicalChartDto> lstNeurologicalChartDto;
+
+            lstNeurologicalChartDto = await _patientService.GetNeurologicalChartAsync(labId, patientId);
+            patientNeurologicalChartViewModel.neurologicalChartDtoList = lstNeurologicalChartDto;
+
+
+            return PartialView("~/Views/patient/_patientNeurologicalChartList.cshtml", patientNeurologicalChartViewModel);
+        }
+
+
+
+        public async Task<IActionResult> GetPatientNeurologicalChart(int Id, int labId, int patientId)
+        {
+            PatientDto patient;
+            patient = await _patientService.GetPatientById(patientId, labId);
+
+            PatientNeurologicalChartViewModel patientNeurologicalChartViewModel = new PatientNeurologicalChartViewModel();
+            patientNeurologicalChartViewModel.patientDto = patient;
+
+            NeurologicalChartDto lstNeurologicalChartDto;
+
+            lstNeurologicalChartDto = await _patientService.GetNeurologicalChartByIdAsync(Id, labId);
+            patientNeurologicalChartViewModel.neurologicalChartDto = lstNeurologicalChartDto;
+
+            return PartialView("~/views/patient/_patientNeurologicalChart.cshtml", patientNeurologicalChartViewModel);
+        }
+
+
+        public async Task<IActionResult> AddPatientNeurologicalAdministration([FromBody] NeurologicalAdministrationDto addsDto)
+        {
+            int result = await _patientService.AddPatientNeurologicalAdministrationAsync(addsDto);
+            return Ok(result);
+        }
+
+        public async Task<IActionResult> GetNeurologicalAdministration(int labId, int patientId, int neurologicalChartId)
+        {
+            IEnumerable<NeurologicalAdministrationDto> lstPatients;
+
+            lstPatients = await _patientService.GetNeurologicalAdministrationAsync(labId, patientId, neurologicalChartId);
+
+            return PartialView("~/views/patient/_patientNeurologicalChartAdminList.cshtml", lstPatients);
+        }
+
+        public async Task<IActionResult> DeleteNeurologicalAdministration(int Id)
+        {
+            int result = await _patientService.DeleteNeurologicalAdministrationAsync(Id);
+            return Ok(result);
+        }
+
+
         public async Task<IActionResult> GetPatientADDSList(int labId, int patientId)
         {
             PatientAddsListViewModel patientAddsListViewModel = new PatientAddsListViewModel();

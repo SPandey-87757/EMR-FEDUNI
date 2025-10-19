@@ -64,6 +64,37 @@ namespace EMRSimulation.Application.Services
             return await _patientRepository.AddPatientIvFluidAdministrationAsync(addsDto);
         }
 
+        //neuro and Fluid chart
+        public async Task<IEnumerable<FluidBalanceChartDto>> GetFluidBalanceChartAsync(int labId, int patientId)
+        {
+            return await _patientRepository.GetFluidBalanceChartAsync(labId, patientId);
+        }
+
+        public async Task<IEnumerable<FluidBalanceAdministrationDto>> GetFluidBalanceAdministrationAsync(int labId, int patientId, int fluidBalanceChartId)
+        {
+            return await _patientRepository.GetFluidBalanceAdministrationAsync(labId, patientId, fluidBalanceChartId);
+        }
+
+        public async Task<int> AddPatientFluidBalanceAdministrationAsync(FluidBalanceAdministrationDto addsDto)
+        {
+            return await _patientRepository.AddPatientFluidBalanceAdministrationAsync(addsDto);
+        }
+
+        public async Task<IEnumerable<NeurologicalChartDto>> GetNeurologicalChartAsync(int labId, int patientId)
+        {
+            return await _patientRepository.GetNeurologicalChartAsync(labId, patientId);
+        }
+
+        public async Task<IEnumerable<NeurologicalAdministrationDto>> GetNeurologicalAdministrationAsync(int labId, int patientId, int neurologicalChartId)
+        {
+            return await _patientRepository.GetNeurologicalAdministrationAsync(labId, patientId, neurologicalChartId);
+        }
+
+        public async Task<int> AddPatientNeurologicalAdministrationAsync(NeurologicalAdministrationDto addsDto)
+        {
+            return await _patientRepository.AddPatientNeurologicalAdministrationAsync(addsDto);
+        }
+
         public async Task<int> DeletePatientAddsAsync(int Id)
         {
             return await _patientRepository.DeletePatientAddsAsync(Id);
@@ -78,9 +109,30 @@ namespace EMRSimulation.Application.Services
         {
             return await _patientRepository.DeleteIvFluidAdministrationAsync(Id);
         }
+
+        //neuro and fluid
+        public async Task<(int id, string resultMessage)> DeleteFluidBalanceChartAsync(int Id)
+        {
+        return await _patientRepository.DeleteFluidBalanceChartAsync(Id);
+        }
+
+        public async Task<int> DeleteFluidBalanceAdministrationAsync(int Id)
+        {
+        return await _patientRepository.DeleteFluidBalanceAdministrationAsync(Id);
+        }
+
+        public async Task<(int id, string resultMessage)> DeleteNeurologicalChartAsync(int Id)
+        {
+        return await _patientRepository.DeleteNeurologicalChartAsync(Id);
+        }
+
+        public async Task<int> DeleteNeurologicalAdministrationAsync(int Id)
+        {
+        return await _patientRepository.DeleteNeurologicalAdministrationAsync(Id);
+        }
         public async Task<(int id, string resultMessage)> DeleteMedicationPrnChartAsync(int Id)
         {
-            return await _patientRepository.DeleteMedicationPrnChartAsync(Id);
+        return await _patientRepository.DeleteMedicationPrnChartAsync(Id);
         }
 
         public async Task<int> DeleteMedicationPrnAdministrationAsync(int Id)
@@ -92,7 +144,17 @@ namespace EMRSimulation.Application.Services
         {
             return await _patientRepository.AddIvFluidChartsync(addsDto);
         }
+//neuro
+        public async Task<FluidBalanceChartDto> GetFluidBalanceChartByIdAsync(int Id, int labId)
+        {
+            return await _patientRepository.GetFluidBalanceChartByIdAsync(Id, labId);
+        }
 
+        public async Task<NeurologicalChartDto> GetNeurologicalChartByIdAsync(int Id, int labId)
+        {
+            return await _patientRepository.GetNeurologicalChartByIdAsync(Id, labId);
+        }
+        
         public async Task<int> AddMedicationPrnChartAsync(MedicationPrnChartDto addsDto)
         {
             return await _patientRepository.AddMedicationPrnChartAsync(addsDto);
@@ -156,6 +218,16 @@ namespace EMRSimulation.Application.Services
         public async Task<IvFluidChartDto> GetIvFluidChartByIdAsync(int Id, int labId)
         {
             return await _patientRepository.GetIvFluidChartByIdAsync(Id, labId);
+        }
+        //update neruo
+        public async Task<int> AddFluidBalanceChartsync(FluidBalanceChartDto addsDto)
+        {
+            return await _patientRepository.AddFluidBalanceChartsync(addsDto);
+        }
+
+        public async Task<int> AddNeurologicalChartsync(NeurologicalChartDto addsDto)
+        {
+            return await _patientRepository.AddNeurologicalChartsync(addsDto);
         }
 
         public async Task<MedicationPrnChartDto> GetMedicationPrnChartByIdAsync(int Id, int labId)

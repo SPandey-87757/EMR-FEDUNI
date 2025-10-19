@@ -40,6 +40,54 @@ namespace EMRSimulationWebApp.Controllers
             }
         }
 
+        //neurological and Fluidbalance
+        public IActionResult GetFluidRecord()
+        {
+            return PartialView("~/views/patient/_patientFluidBalanceChartAdd.cshtml");
+        }
+        public async Task<IActionResult> AddFluidBalanceChart([FromBody] FluidBalanceChartDto addsDto)
+        {
+            if (addsDto == null)
+            {
+                return BadRequest("Patient ADDS data is required.");
+            }
+
+            try
+            {
+                var newId = await _patientService.AddFluidBalanceChartsync(addsDto);
+                return Ok(newId);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "An error occurred while adding the patient adds." + ex);
+            }
+        }
+
+        public IActionResult GetNeurologicalRecord()
+        {
+            return PartialView("~/views/patient/_patientNeurologicalChartAdd.cshtml");
+        }
+        public async Task<IActionResult> AddNeurologicalChart([FromBody] NeurologicalChartDto addsDto)
+        {
+            if (addsDto == null)
+            {
+                return BadRequest("Patient ADDS data is required.");
+            }
+
+            try
+            {
+                var newId = await _patientService.AddNeurologicalChartsync(addsDto);
+                return Ok(newId);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                return StatusCode(500, "An error occurred while adding the patient adds." + ex);
+            }
+        }
+
+
         public async Task<IActionResult> GetMedicationPrn(int labId)
         {
             var medications = await _patientService.GetMedicationAsync(labId);
@@ -220,6 +268,40 @@ namespace EMRSimulationWebApp.Controllers
             return Ok(new { id = id, resultMessage = resultMessage });
         }
 
+
+//neurological hcart nad Fluid balance chart
+        public async Task<IActionResult> GetPatientFluidBalanceChartList(int labId, int patientId)
+        {
+            IEnumerable<FluidBalanceChartDto> lstFluidBalanceChartDto;
+
+            lstFluidBalanceChartDto = await _patientService.GetFluidBalanceChartAsync(labId, patientId);
+
+            return PartialView("~/views/patient/_patientFluidRecordList.cshtml", lstFluidBalanceChartDto);
+        }
+
+        public async Task<IActionResult> DeleteFluidBalanceChart(int Id)
+        {
+            var (id, resultMessage) = await _patientService.DeleteFluidBalanceChartAsync(Id);
+            return Ok(new { id = id, resultMessage = resultMessage });
+        }
+
+
+        public async Task<IActionResult> GetPatientNeurologicalChartList(int labId, int patientId)
+        {
+            IEnumerable<NeurologicalChartDto> lstNeurologicalChartDto;
+
+            lstNeurologicalChartDto = await _patientService.GetNeurologicalChartAsync(labId, patientId);
+
+            return PartialView("~/views/patient/_patientNeurologicalRecordList.cshtml", lstNeurologicalChartDto);
+        }
+
+        public async Task<IActionResult> DeleteNeurologicaleChart(int Id)
+        {
+            var (id, resultMessage) = await _patientService.DeleteNeurologicalChartAsync(Id);
+            return Ok(new { id = id, resultMessage = resultMessage });
+        }
+
+        
         public async Task<IActionResult> GetPatientMedicationPrnList(int labId, int patientId)
         {
             IEnumerable<MedicationPrnChartDto> lstMedicationPrnChartDto;
