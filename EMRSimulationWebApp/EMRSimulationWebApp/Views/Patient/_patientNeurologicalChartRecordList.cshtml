@@ -1,0 +1,119 @@
+@{
+    ViewData["Title"] = "Patient List";
+}
+@using EMRSimulation.Domain.Dtos;
+@model IEnumerable<NeurologicalChartDto>
+
+<div class="form-group row mb-1" style="background-color: black;color: white;">
+    <div class="col-sm-7">
+        <label class="col-sm-5 col-form-label">NEUROLOGICAL RECORD LIST</label>
+    </div>
+</div>
+<div class="text-left">
+    <table id="patientsNeurologicalRecordTable" class="display">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Date</th>
+                <th>Eyes Open</th>
+                <th>Verbal Response</th>
+                <th>Motor Response</th>
+                <th>Total GCS</th>
+                <th>Endotracheal Tube</th>
+                <th>Right Pupil Size</th>
+                <th>Right Pupil Reaction</th>
+                <th>Left Pupil Size</th>
+                <th>Left Pupil Reaction</th>
+                <th>Arm Response</th>
+                <th>Leg Response</th>
+                <th>Nurse Sign</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@Convert.ToDateTime(item.Date).ToShortDateString()</td>
+                    <td>@item.EyesOpenScore</td>
+                    <td>@item.VerbalResponseScore</td>
+                    <td>@item.MotorResponseScore</td>
+                    <td>@item.TotalComaScale</td>
+                    <td>@(item.EndotrachealTube.HasValue && item.EndotrachealTube.Value ? "Yes" : "No")</td>
+                    <td>@item.RightPupilSize</td>
+                    <td>@item.RightPupilReaction</td>
+                    <td>@item.LeftPupilSize</td>
+                    <td>@item.LeftPupilReaction</td>
+                    <td>@item.ArmResponse</td>
+                    <td>@item.LegResponse</td>
+                    <td>@item.OfficerSign</td>
+                    <td>
+                        <a href="javascript:void(0);" class="btn btn-primary deleteNeurologicalRecord" data-custom="@item.Id" style="background-color:#FF8A30;">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <label id="lblMessage" style="color:green"></label>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var table = $('#patientsNeurologicalRecordTable').DataTable({
+            "paging": true,
+            "info": false,
+            "searching": false,
+            "ordering": true,
+            "autoWidth": false,
+            "lengthChange": false,
+            "columnDefs": [
+                {
+                    "targets": [0],
+                    "visible": false
+                }
+            ]
+        });
+
+        var LabId = $('#txtLabId').val();
+        var PatientId = $('#txtPatientId').val();
+
+        $('#patientsNeurologicalRecordTable').on('click', '.deleteNeurologicalRecord', function () {
+            var addsId = $(this).attr("data-custom");
+
+            if (!confirm("Are you sure you want to delete this record?")) {
+                return;
+            }
+
+            $.ajax({
+                type: "POST", // use POST instead of GET
+                url: "/supervisor/DeleteNeurologicaleChart", // match controller spelling
+                data: { Id: addsId },
+                success: function (response) {
+                    if (response.id > 0) {
+                        alert("Neurological Record deleted successfully");
+
+                        $.ajax({
+                            url: "/supervisor/GetPatientNeurologicalChartList",
+                            method: "GET",
+                            data: { labId: LabId, patientId: PatientId },
+                            success: function (response) {
+                                $('#divlstNeurologicalRecord').html(response);
+                            },
+                            error: function (xhr, status, error) {
+                                console.error("Error loading the page:", error);
+                            }
+                        });
+                    } else {
+                        $('#lblMessage').text(response.resultMessage).css('color', 'red');
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.log("Error:", textStatus);
+                }
+            });
+        });
+    });
+</script>
