@@ -302,6 +302,93 @@ namespace EMRSimulation.Infrastructure.Repositories
             }
         }
 
+        public async Task<int> AddFluidBalanceChartsync(FluidBalanceChartDto addsDto)
+        {
+            using (var connection = await _dbConnectionFactory.CreateAsync())
+            {
+                using (var command = (SqlCommand)connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "InsertFluidBalanceChart";
+
+                    command.Parameters.Add(new SqlParameter("@LabId", addsDto.LabId));
+                    command.Parameters.Add(new SqlParameter("@PatientId", addsDto.PatientId));
+                    command.Parameters.Add(new SqlParameter("@Date", addsDto.Date));
+
+                    // Intake Parameters
+                    command.Parameters.Add(new SqlParameter("@IV_Fluids", addsDto.IV_Fluids ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@Oral_Intake", addsDto.Oral_Intake ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@Enteric_Intake", addsDto.Enteric_Intake ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@Other_Fluids", addsDto.Other_Fluids ?? (object)DBNull.Value));
+                    // Output Parameters
+                    command.Parameters.Add(new SqlParameter("@Urine_Output", addsDto.Urine_Output ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@Faecal_Output", addsDto.Faecal_Output ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@Vomitus", addsDto.Vomitus ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@Drainage", addsDto.Drainage ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@Gastric_Aspirate", addsDto.Gastric_Aspirate ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@Bladder_Scan", addsDto.Bladder_Scan ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@Other_Output", addsDto.Other_Output ?? (object)DBNull.Value));
+
+                    var newId = await command.ExecuteScalarAsync();
+#pragma warning disable CS8605 // Unboxing a possibly null value.
+                    return (int)newId;
+#pragma warning restore CS8605 // Unboxing a possibly null value.
+                }
+            }
+        }
+
+        public async Task<int> AddNeurologicalChartsync(NeurologicalChartDto addsDto)
+        {
+            using (var connection = await _dbConnectionFactory.CreateAsync())
+            {
+                using (var command = (SqlCommand)connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "InsertNeurologicalChart"; // Stored procedure name
+
+                    // Add parameters to the command
+                    command.Parameters.Add(new SqlParameter("@LabId", addsDto.LabId ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@PatientId", addsDto.PatientId ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@Date", addsDto.Date ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@Time", addsDto.Time ?? (object)DBNull.Value));
+
+                    // EyesOpenScore as int
+                    command.Parameters.Add(new SqlParameter("@EyesOpenScore", addsDto.EyesOpenScore ?? (object)DBNull.Value));
+
+                    // VerbalResponseScore as string
+                    command.Parameters.Add(new SqlParameter("@VerbalResponseScore", string.IsNullOrEmpty(addsDto.VerbalResponseScore) ? (object)DBNull.Value : addsDto.VerbalResponseScore));
+
+                    // MotorResponseScore as int
+                    command.Parameters.Add(new SqlParameter("@MotorResponseScore", addsDto.MotorResponseScore ?? (object)DBNull.Value));
+
+                    // TotalComaScale as int
+                    command.Parameters.Add(new SqlParameter("@TotalComaScale", addsDto.TotalComaScale ?? (object)DBNull.Value));
+
+                    command.Parameters.Add(new SqlParameter("@EndotrachealTube", addsDto.EndotrachealTube ?? (object)DBNull.Value));
+
+                    // RightPupilSize as int
+                    command.Parameters.Add(new SqlParameter("@RightPupilSize", addsDto.RightPupilSize ?? (object)DBNull.Value));
+
+                    command.Parameters.Add(new SqlParameter("@RightPupilReaction", string.IsNullOrEmpty(addsDto.RightPupilReaction) ? (object)DBNull.Value : addsDto.RightPupilReaction));
+
+                    // LeftPupilSize as int
+                    command.Parameters.Add(new SqlParameter("@LeftPupilSize", addsDto.LeftPupilSize ?? (object)DBNull.Value));
+
+                    command.Parameters.Add(new SqlParameter("@LeftPupilReaction", string.IsNullOrEmpty(addsDto.LeftPupilReaction) ? (object)DBNull.Value : addsDto.LeftPupilReaction));
+
+                    command.Parameters.Add(new SqlParameter("@ArmResponse", string.IsNullOrEmpty(addsDto.ArmResponse) ? (object)DBNull.Value : addsDto.ArmResponse));
+                    command.Parameters.Add(new SqlParameter("@LegResponse", string.IsNullOrEmpty(addsDto.LegResponse) ? (object)DBNull.Value : addsDto.LegResponse));
+                    command.Parameters.Add(new SqlParameter("@OfficerSign", addsDto.OfficerSign ?? (object)DBNull.Value));
+
+                    // Execute the command and return the new identity value
+                    var newId = await command.ExecuteScalarAsync();
+#pragma warning disable CS8605 // Unboxing a possibly null value.
+                    return (int)newId;
+#pragma warning restore CS8605 // Unboxing a possibly null value.
+                }
+            }
+        }
+
         public async Task<int> AddMedicationPrnChartAsync(MedicationPrnChartDto addsDto)
         {
             using (var connection = await _dbConnectionFactory.CreateAsync())
@@ -683,6 +770,397 @@ namespace EMRSimulation.Infrastructure.Repositories
                 }
             }
         }
+
+            public async Task<IEnumerable<FluidBalanceChartDto>> GetFluidBalanceChartAsync(int labId, int patientId)
+        {
+            var patients = new List<FluidBalanceChartDto>();
+
+            // Create and open the database connection using the connection factory
+            using (var connection = await _dbConnectionFactory.CreateAsync())
+            {
+                // Ensure we're working with SqlCommand for asynchronous operations
+                using (var command = (SqlCommand)connection.CreateCommand())
+                {
+                    command.CommandText = "GetFluidBalanceChart"; // Assuming stored procedure name is GetPatients
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    // Add parameters to the command
+                    command.Parameters.Add(new SqlParameter("@LabId", labId));
+                    command.Parameters.Add(new SqlParameter("@PatientId", patientId));
+
+                    // Execute the stored procedure and read the results asynchronously
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+var patient = new FluidBalanceChartDto
+{
+    Id = reader.GetInt32(reader.GetOrdinal("Id")), // Id, LabId, PatientId are likely non-nullable
+    LabId = reader.GetInt32(reader.GetOrdinal("LabId")),
+    PatientId = reader.GetInt32(reader.GetOrdinal("PatientId")),
+    Date = reader.IsDBNull(reader.GetOrdinal("Date")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("Date")),
+    IV_Fluids = reader.IsDBNull(reader.GetOrdinal("IV_Fluids")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("IV_Fluids")),
+    Oral_Intake = reader.IsDBNull(reader.GetOrdinal("Oral_Intake")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Oral_Intake")),
+    Enteric_Intake = reader.IsDBNull(reader.GetOrdinal("Enteric_Intake")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Enteric_Intake")),
+    Other_Fluids = reader.IsDBNull(reader.GetOrdinal("Other_Fluids")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Other_Fluids")),
+    Cumulative_Intake = reader.IsDBNull(reader.GetOrdinal("Cumulative_Intake")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Cumulative_Intake")),
+    Urine_Output = reader.IsDBNull(reader.GetOrdinal("Urine_Output")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Urine_Output")),
+    Faecal_Output = reader.IsDBNull(reader.GetOrdinal("Faecal_Output")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Faecal_Output")),
+    Vomitus = reader.IsDBNull(reader.GetOrdinal("Vomitus")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Vomitus")),
+    Drainage = reader.IsDBNull(reader.GetOrdinal("Drainage")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Drainage")),
+    Gastric_Aspirate = reader.IsDBNull(reader.GetOrdinal("Gastric_Aspirate")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Gastric_Aspirate")),
+    Bladder_Scan = reader.IsDBNull(reader.GetOrdinal("Bladder_Scan")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Bladder_Scan")),
+    Other_Output = reader.IsDBNull(reader.GetOrdinal("Other_Output")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Other_Output")),
+    Cumulative_Output = reader.IsDBNull(reader.GetOrdinal("Cumulative_Output")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Cumulative_Output")),
+    Difference = reader.IsDBNull(reader.GetOrdinal("Difference")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Diiference")),
+};
+                            patients.Add(patient);
+                        }
+                    }
+                }
+            }
+
+            return patients;
+        }
+
+        public async Task<int> AddPatientFluidBalanceAdministrationAsync(FluidBalanceAdministrationDto addsDto)
+        {
+            using (var connection = await _dbConnectionFactory.CreateAsync())
+            {
+                using (var command = (SqlCommand)connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "InsertFluidBalanceAdministration"; // Stored procedure name
+
+                    command.Parameters.Add(new SqlParameter("@LabId", addsDto.LabId));
+                    command.Parameters.Add(new SqlParameter("@PatientId", addsDto.PatientId));
+                    command.Parameters.Add(new SqlParameter("@FluidBalanceChartId", addsDto.FluidBalanceChartId));
+                    command.Parameters.Add(new SqlParameter("@StartDate", addsDto.StartDate ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@StartTime", addsDto.StartTime ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@EndDate", addsDto.EndDate ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@EndTime", addsDto.EndTime ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@VolGiven", addsDto.VolGiven ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@PharmacistReview", addsDto.PharmacistReview ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@NurseSign", addsDto.NurseSign ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@CoSign", addsDto.CoSign ?? (object)DBNull.Value));
+
+                    // Execute the command and return the new identity value
+                    var newId = await command.ExecuteScalarAsync();
+#pragma warning disable CS8605 // Unboxing a possibly null value.
+                    return (int)newId;
+#pragma warning restore CS8605 // Unboxing a possibly null value.
+                }
+            }
+        }
+
+        public async Task<IEnumerable<FluidBalanceAdministrationDto>> GetFluidBalanceAdministrationAsync(int labId, int patientId, int fluidBalanceChartId)
+        {
+            var patients = new List<FluidBalanceAdministrationDto>();
+
+            // Create and open the database connection using the connection factory
+            using (var connection = await _dbConnectionFactory.CreateAsync())
+            {
+                // Ensure we're working with SqlCommand for asynchronous operations
+                using (var command = (SqlCommand)connection.CreateCommand())
+                {
+                    command.CommandText = "GetFluidBalanceAdministration"; // Assuming stored procedure name is GetPatients
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    // Add parameters to the command
+                    command.Parameters.Add(new SqlParameter("@LabId", labId));
+                    command.Parameters.Add(new SqlParameter("@PatientId", patientId));
+                    command.Parameters.Add(new SqlParameter("@FluidBalanceChartId", fluidBalanceChartId));
+
+                    // Execute the stored procedure and read the results asynchronously
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var patient = new FluidBalanceAdministrationDto
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                LabId = reader.GetInt32(reader.GetOrdinal("LabId")),
+                                PatientId = reader.GetInt32(reader.GetOrdinal("PatientId")),
+                                FluidBalanceChartId = reader.GetInt32(reader.GetOrdinal("FluidBalanceChartId")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                StartTime = reader.IsDBNull(reader.GetOrdinal("StartTime")) ? null : reader.GetString(reader.GetOrdinal("StartTime")),
+                                EndDate = reader.IsDBNull(reader.GetOrdinal("EndDate")) ? null : reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                                EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? null : reader.GetString(reader.GetOrdinal("EndTime")),
+                                VolGiven = reader.IsDBNull(reader.GetOrdinal("VolGiven")) ? null : reader.GetString(reader.GetOrdinal("VolGiven")),
+                                PharmacistReview = reader.IsDBNull(reader.GetOrdinal("PharmacistReview")) ? null : reader.GetString(reader.GetOrdinal("PharmacistReview")),
+                                NurseSign = reader.IsDBNull(reader.GetOrdinal("NurseSign")) ? null : reader.GetString(reader.GetOrdinal("NurseSign")),
+                                CoSign = reader.IsDBNull(reader.GetOrdinal("CoSign")) ? null : reader.GetString(reader.GetOrdinal("CoSign"))
+                            };
+
+                            patients.Add(patient);
+                        }
+                    }
+                }
+            }
+
+            return patients;
+        }
+
+        public async Task<(int id, string resultMessage)> DeleteFluidBalanceChartAsync(int Id)
+        {
+            int id = 0;
+            string resultMessage = "";
+
+            // Create and open the database connection using the connection factory
+            using (var connection = await _dbConnectionFactory.CreateAsync())
+            {
+                // Ensure we're working with SqlCommand for asynchronous operations
+                using (var command = (SqlCommand)connection.CreateCommand())
+                {
+                    command.CommandText = "DeleteFluidBalanceChart"; // Assuming stored procedure name is GetPatients
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    // Add parameters to the command
+                    command.Parameters.Add(new SqlParameter("@Id", Id));
+
+                    // Execute the stored procedure and read the results asynchronously
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            id = reader.GetInt32(reader.GetOrdinal("RowsAffected"));
+                            resultMessage = reader.GetString(reader.GetOrdinal("ResultMessage"));
+                        }
+                    }
+                }
+            }
+
+            return (id, resultMessage);
+        }
+
+        public async Task<int> DeleteFluidBalanceAdministrationAsync(int Id)
+        {
+            using (var connection = await _dbConnectionFactory.CreateAsync())
+            {
+                using (var command = (SqlCommand)connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "DeleteFluidBalanceAdministration"; // Stored procedure name
+
+                    // Add parameters to the command
+                    command.Parameters.Add(new SqlParameter("@Id", Id));
+
+                    // Execute the command and return the new identity value
+                    var newId = await command.ExecuteScalarAsync();
+#pragma warning disable CS8605 // Unboxing a possibly null value.
+                    return (int)newId;
+#pragma warning restore CS8605 // Unboxing a possibly null value.
+                }
+            }
+        }
+
+        public async Task<IEnumerable<NeurologicalChartDto>> GetNeurologicalChartAsync(int labId, int patientId)
+        {
+            var patients = new List<NeurologicalChartDto>();
+
+            // Create and open the database connection using the connection factory
+            using (var connection = await _dbConnectionFactory.CreateAsync())
+            {
+                // Ensure we're working with SqlCommand for asynchronous operations
+                using (var command = (SqlCommand)connection.CreateCommand())
+                {
+                    command.CommandText = "GetNeurologicalChart"; // Assuming stored procedure name is GetPatients
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    // Add parameters to the command
+                    command.Parameters.Add(new SqlParameter("@LabId", labId));
+                    command.Parameters.Add(new SqlParameter("@PatientId", patientId));
+                    
+
+                    // Execute the stored procedure and read the results asynchronously
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var patient = new NeurologicalChartDto
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                LabId = reader.GetInt32(reader.GetOrdinal("LabId")),
+                                PatientId = reader.GetInt32(reader.GetOrdinal("PatientId")),
+                                Date = reader.GetDateTime(reader.GetOrdinal("Date")),
+
+                                // Time as TimeSpan
+                                Time = reader.IsDBNull(reader.GetOrdinal("Time")) ? null : reader.GetTimeSpan(reader.GetOrdinal("Time")),
+
+                                // EyesOpenScore as int
+                                EyesOpenScore = reader.IsDBNull(reader.GetOrdinal("EyesOpenScore")) ? null : reader.GetInt32(reader.GetOrdinal("EyesOpenScore")),
+
+                                // VerbalResponseScore as string
+                                VerbalResponseScore = reader.IsDBNull(reader.GetOrdinal("VerbalResponseScore")) ? null : reader.GetString(reader.GetOrdinal("VerbalResponseScore")),
+
+                                // MotorResponseScore as int
+                                MotorResponseScore = reader.IsDBNull(reader.GetOrdinal("MotorResponseScore")) ? null : reader.GetInt32(reader.GetOrdinal("MotorResponseScore")),
+
+                                // TotalComaScale as int
+                                TotalComaScale = reader.IsDBNull(reader.GetOrdinal("TotalComaScale")) ? null : reader.GetInt32(reader.GetOrdinal("TotalComaScale")),
+
+                                EndotrachealTube = reader.IsDBNull(reader.GetOrdinal("EndotrachealTube")) ? (bool?)null : reader.GetBoolean(reader.GetOrdinal("EndotrachealTube")),
+
+                                // RightPupilSize as int
+                                RightPupilSize = reader.IsDBNull(reader.GetOrdinal("RightPupilSize")) ? null : reader.GetInt32(reader.GetOrdinal("RightPupilSize")),
+
+                                RightPupilReaction = reader.IsDBNull(reader.GetOrdinal("RightPupilReaction")) ? null : reader.GetString(reader.GetOrdinal("RightPupilReaction")),
+
+                                // LeftPupilSize as int
+                                LeftPupilSize = reader.IsDBNull(reader.GetOrdinal("LeftPupilSize")) ? null : reader.GetInt32(reader.GetOrdinal("LeftPupilSize")),
+
+                                LeftPupilReaction = reader.IsDBNull(reader.GetOrdinal("LeftPupilReaction")) ? null : reader.GetString(reader.GetOrdinal("LeftPupilReaction")),
+
+                                ArmResponse = reader.IsDBNull(reader.GetOrdinal("ArmResponse")) ? null : reader.GetString(reader.GetOrdinal("ArmResponse")),
+
+                                LegResponse = reader.IsDBNull(reader.GetOrdinal("LegResponse")) ? null : reader.GetString(reader.GetOrdinal("LegResponse")),
+
+                                OfficerSign = reader.IsDBNull(reader.GetOrdinal("OfficerSign")) ? null : reader.GetString(reader.GetOrdinal("OfficerSign"))
+                            };
+
+
+                            patients.Add(patient);
+                        }
+                    }
+                }
+            }
+
+            return patients;
+        }
+
+        public async Task<int> AddPatientNeurologicalAdministrationAsync(NeurologicalAdministrationDto addsDto)
+        {
+            using (var connection = await _dbConnectionFactory.CreateAsync())
+            {
+                using (var command = (SqlCommand)connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "InsertNeurologicalAdministration"; // Stored procedure name
+
+                    // Add parameters to the command
+                    command.Parameters.Add(new SqlParameter("@LabId", addsDto.LabId));
+                    command.Parameters.Add(new SqlParameter("@PatientId", addsDto.PatientId));
+                    command.Parameters.Add(new SqlParameter("@NeurologicalChartId", addsDto.NeurologicalChartId));
+
+                    command.Parameters.Add(new SqlParameter("@StartDate", addsDto.StartDate ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@StartTime", addsDto.StartTime ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@EndDate", addsDto.EndDate ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@EndTime", addsDto.EndTime ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@PharmacistReview", addsDto.PharmacistReview ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@NurseSign", addsDto.NurseSign ?? (object)DBNull.Value));
+                    command.Parameters.Add(new SqlParameter("@CoSign", addsDto.CoSign ?? (object)DBNull.Value));
+
+
+
+                    // Execute the command and return the new identity value
+                    var newId = await command.ExecuteScalarAsync();
+#pragma warning disable CS8605 // Unboxing a possibly null value.
+                    return (int)newId;
+#pragma warning restore CS8605 // Unboxing a possibly null value.
+                }
+            }
+        }
+
+        public async Task<IEnumerable<NeurologicalAdministrationDto>> GetNeurologicalAdministrationAsync(int labId, int patientId, int neurologicalChartId)
+        {
+            var patients = new List<NeurologicalAdministrationDto>();
+
+            // Create and open the database connection using the connection factory
+            using (var connection = await _dbConnectionFactory.CreateAsync())
+            {
+                // Ensure we're working with SqlCommand for asynchronous operations
+                using (var command = (SqlCommand)connection.CreateCommand())
+                {
+                    command.CommandText = "GetNeurologicalAdministration"; // Assuming stored procedure name is GetPatients
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    // Add parameters to the command
+                    command.Parameters.Add(new SqlParameter("@LabId", labId));
+                    command.Parameters.Add(new SqlParameter("@PatientId", patientId));
+                    command.Parameters.Add(new SqlParameter("@NeurologicalChartId", neurologicalChartId));
+
+                    // Execute the stored procedure and read the results asynchronously
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var patient = new NeurologicalAdministrationDto
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                LabId = reader.GetInt32(reader.GetOrdinal("LabId")),
+                                PatientId = reader.GetInt32(reader.GetOrdinal("PatientId")),
+                                NeurologicalChartId = reader.GetInt32(reader.GetOrdinal("NeurologicalChartId")),
+                                StartDate = reader.GetDateTime(reader.GetOrdinal("StartDate")),
+                                StartTime = reader.IsDBNull(reader.GetOrdinal("StartTime")) ? null : reader.GetString(reader.GetOrdinal("StartTime")),
+                                EndDate = reader.IsDBNull(reader.GetOrdinal("EndDate")) ? null : reader.GetDateTime(reader.GetOrdinal("EndDate")),
+                                EndTime = reader.IsDBNull(reader.GetOrdinal("EndTime")) ? null : reader.GetString(reader.GetOrdinal("EndTime")),
+                                PharmacistReview = reader.IsDBNull(reader.GetOrdinal("PharmacistReview")) ? null : reader.GetString(reader.GetOrdinal("PharmacistReview")),
+                                NurseSign = reader.IsDBNull(reader.GetOrdinal("NurseSign")) ? null : reader.GetString(reader.GetOrdinal("NurseSign")),
+                                CoSign = reader.IsDBNull(reader.GetOrdinal("CoSign")) ? null : reader.GetString(reader.GetOrdinal("CoSign"))
+                            };
+
+                            patients.Add(patient);
+                        }
+                    }
+                }
+            }
+
+            return patients;
+        }
+
+        public async Task<(int id, string resultMessage)> DeleteNeurologicalChartAsync(int Id)
+        {
+            int id = 0;
+            string resultMessage = "";
+
+            // Create and open the database connection using the connection factory
+            using (var connection = await _dbConnectionFactory.CreateAsync())
+            {
+                // Ensure we're working with SqlCommand for asynchronous operations
+                using (var command = (SqlCommand)connection.CreateCommand())
+                {
+                    command.CommandText = "DeleteNeurologicalChart"; // Assuming stored procedure name is GetPatients
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    // Add parameters to the command
+                    command.Parameters.Add(new SqlParameter("@Id", Id));
+
+                    // Execute the stored procedure and read the results asynchronously
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            id = reader.GetInt32(reader.GetOrdinal("RowsAffected"));
+                            resultMessage = reader.GetString(reader.GetOrdinal("ResultMessage"));
+                        }
+                    }
+                }
+            }
+
+            return (id, resultMessage);
+        }
+
+        public async Task<int> DeleteNeurologicalAdministrationAsync(int Id)
+        {
+            using (var connection = await _dbConnectionFactory.CreateAsync())
+            {
+                using (var command = (SqlCommand)connection.CreateCommand())
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.CommandText = "DeleteNeurologicalAdministration"; // Stored procedure name
+
+                    // Add parameters to the command
+                    command.Parameters.Add(new SqlParameter("@Id", Id));
+
+                    // Execute the command and return the new identity value
+                    var newId = await command.ExecuteScalarAsync();
+#pragma warning disable CS8605 // Unboxing a possibly null value.
+                    return (int)newId;
+#pragma warning restore CS8605 // Unboxing a possibly null value.
+                }
+            }
+        }
+
 
         public async Task<(int id, string resultMessage)> DeleteMedicationPrnChartAsync(int Id)
         {
@@ -1863,6 +2341,120 @@ namespace EMRSimulation.Infrastructure.Repositories
 
             return patient;
         }
+
+//update neruo
+        public async Task<FluidBalanceChartDto> GetFluidBalanceChartByIdAsync(int Id, int labId)
+        {
+            var patient = new FluidBalanceChartDto(); // Renamed variable for clarity
+
+            using (var connection = await _dbConnectionFactory.CreateAsync())
+            {
+                using (var command = (SqlCommand)connection.CreateCommand())
+                {
+                    command.CommandText = "GetFluidBalanceChart"; // Updated stored procedure name
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    command.Parameters.Add(new SqlParameter("@Id", Id));
+                    command.Parameters.Add(new SqlParameter("@LabId", labId));
+                    
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            patient.Id = reader.GetInt32(reader.GetOrdinal("Id"));
+                            patient.LabId = reader.GetInt32(reader.GetOrdinal("LabId"));
+                            patient.PatientId = reader.GetInt32(reader.GetOrdinal("PatientId"));
+                            patient.Date = reader.IsDBNull(reader.GetOrdinal("Date")) ? (DateTime?)null : reader.GetDateTime(reader.GetOrdinal("Date"));
+                            patient.IV_Fluids = reader.IsDBNull(reader.GetOrdinal("IV_Fluids")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("IV_Fluids"));
+                            patient.Oral_Intake = reader.IsDBNull(reader.GetOrdinal("Oral_Intake")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Oral_Intake"));
+                            patient.Enteric_Intake = reader.IsDBNull(reader.GetOrdinal("Enteric_Intake")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Enteric_Intake"));
+                            patient.Other_Fluids = reader.IsDBNull(reader.GetOrdinal("Other_Fluids")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Other_Fluids"));
+                            patient.Cumulative_Intake = reader.IsDBNull(reader.GetOrdinal("Cumulative_Intake")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Cumulative_Intake"));
+                            patient.Urine_Output = reader.IsDBNull(reader.GetOrdinal("Urine_Output")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Urine_Output"));
+                            patient.Faecal_Output = reader.IsDBNull(reader.GetOrdinal("Faecal_Output")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Faecal_Output"));
+                            patient.Vomitus = reader.IsDBNull(reader.GetOrdinal("Vomitus")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Vomitus"));
+                            patient.Drainage = reader.IsDBNull(reader.GetOrdinal("Drainage")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Drainage"));
+                            patient.Gastric_Aspirate = reader.IsDBNull(reader.GetOrdinal("Gastric_Aspirate")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Gastric_Aspirate"));
+                            patient.Bladder_Scan = reader.IsDBNull(reader.GetOrdinal("Bladder_Scan")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Bladder_Scan"));
+                            patient.Other_Output = reader.IsDBNull(reader.GetOrdinal("Other_Output")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Other_Output"));
+                            patient.Cumulative_Output = reader.IsDBNull(reader.GetOrdinal("Cumulative_Output")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Cumulative_Output"));
+                            patient.Difference = reader.IsDBNull(reader.GetOrdinal("Difference")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("Difference"));
+                        }
+                    
+                    }
+                }
+            }
+            return patient;
+        }
+
+        public async Task<NeurologicalChartDto> GetNeurologicalChartByIdAsync(int Id, int labId)
+        {
+            var patient = new NeurologicalChartDto();
+
+            // Create and open the database connection using the connection factory
+            using (var connection = await _dbConnectionFactory.CreateAsync())
+            {
+                // Ensure we're working with SqlCommand for asynchronous operations
+                using (var command = (SqlCommand)connection.CreateCommand())
+                {
+                    command.CommandText = "GetNeurologicalChart"; // Assuming stored procedure name is GetPatients
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    // Add parameters to the command
+                    command.Parameters.Add(new SqlParameter("@Id", Id));
+                    command.Parameters.Add(new SqlParameter("@LabId", labId));
+
+                    // Execute the stored procedure and read the results asynchronously
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            patient.Id = reader.GetInt32(reader.GetOrdinal("Id"));
+                            patient.LabId = reader.GetInt32(reader.GetOrdinal("LabId"));
+                            patient.PatientId = reader.GetInt32(reader.GetOrdinal("PatientId"));
+                            patient.Date = reader.GetDateTime(reader.GetOrdinal("Date"));
+
+                            // Time as TimeSpan
+                            patient.Time = reader.IsDBNull(reader.GetOrdinal("Time")) ? null : reader.GetTimeSpan(reader.GetOrdinal("Time"));
+
+                            // EyesOpenScore as int
+                            patient.EyesOpenScore = reader.IsDBNull(reader.GetOrdinal("EyesOpenScore")) ? null : reader.GetInt32(reader.GetOrdinal("EyesOpenScore"));
+
+                            // VerbalResponseScore as string
+                            patient.VerbalResponseScore = reader.IsDBNull(reader.GetOrdinal("VerbalResponseScore")) ? null : reader.GetString(reader.GetOrdinal("VerbalResponseScore"));
+
+                            // MotorResponseScore as int
+                            patient.MotorResponseScore = reader.IsDBNull(reader.GetOrdinal("MotorResponseScore")) ? null : reader.GetInt32(reader.GetOrdinal("MotorResponseScore"));
+
+                            // TotalComaScale as int
+                            patient.TotalComaScale = reader.IsDBNull(reader.GetOrdinal("TotalComaScale")) ? null : reader.GetInt32(reader.GetOrdinal("TotalComaScale"));
+
+                            patient.EndotrachealTube = reader.IsDBNull(reader.GetOrdinal("EndotrachealTube")) ? (bool?)null : reader.GetBoolean(reader.GetOrdinal("EndotrachealTube"));
+
+                            // RightPupilSize as int
+                            patient.RightPupilSize = reader.IsDBNull(reader.GetOrdinal("RightPupilSize")) ? null : reader.GetInt32(reader.GetOrdinal("RightPupilSize"));
+
+                            patient.RightPupilReaction = reader.IsDBNull(reader.GetOrdinal("RightPupilReaction")) ? null : reader.GetString(reader.GetOrdinal("RightPupilReaction"));
+
+                            // LeftPupilSize as int
+                            patient.LeftPupilSize = reader.IsDBNull(reader.GetOrdinal("LeftPupilSize")) ? null : reader.GetInt32(reader.GetOrdinal("LeftPupilSize"));
+
+                            patient.LeftPupilReaction = reader.IsDBNull(reader.GetOrdinal("LeftPupilReaction")) ? null : reader.GetString(reader.GetOrdinal("LeftPupilReaction"));
+
+                            patient.ArmResponse = reader.IsDBNull(reader.GetOrdinal("ArmResponse")) ? null : reader.GetString(reader.GetOrdinal("ArmResponse"));
+
+                            patient.LegResponse = reader.IsDBNull(reader.GetOrdinal("LegResponse")) ? null : reader.GetString(reader.GetOrdinal("LegResponse"));
+
+                            patient.OfficerSign = reader.IsDBNull(reader.GetOrdinal("OfficerSign")) ? null : reader.GetString(reader.GetOrdinal("OfficerSign"));
+                        }
+                    }
+                }
+            }
+
+            return patient;
+        }
+
 
         public async Task<MedicationRegularChartDto> GetMedicationRegularChartByIdAsync(int Id, int labId)
         {
