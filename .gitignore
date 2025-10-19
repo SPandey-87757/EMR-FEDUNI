@@ -1,0 +1,9 @@
+PublishedWebsite/ 
+EMRSimulationWebApp/EMRSimulationWebApp/obj/
+EMRSimulationWebApp/EMRSimulationWebApp/bin/
+EMRSimulationWebApp/EMRSimulation.Application/obj/
+EMRSimulationWebApp/EMRSimulation.Application/bin/
+EMRSimulationWebApp/EMRSimulation.Infrastructure/obj/
+EMRSimulationWebApp/EMRSimulation.Infrastructure/bin/
+EMRSimulationWebApp/EMRSimulation.Domain/obj/
+EMRSimulationWebApp/EMRSimulation.Domain/bin/
