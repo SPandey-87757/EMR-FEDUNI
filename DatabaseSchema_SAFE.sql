@@ -116,6 +116,207 @@ CREATE TABLE [dbo].[IvFluidChart](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+
+
+/****** Object: Table [dbo].[FluidBalanceAdministration] Script Date: 04/05/2025 2:31:48 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[FluidBalanceAdministration](
+    [Id] [int] IDENTITY(1,1) NOT NULL,
+	[LabId] [int] NULL,
+	[PatientId] [int] NULL,
+	[FluidBalanceChartId] [int] NULL,
+	[StartDate] [date] NULL,
+	[StartTime] [varchar](50) NULL,
+	[EndDate] [date] NULL,
+	[EndTime] [varchar](50) NULL,
+	[VolGiven] [varchar](50) NULL,
+	[PharmacistReview] [varchar](200) NULL,
+	[NurseSign] [varchar](50) NULL,
+	[CoSign] [varchar](50) NULL,
+
+    -- Signature Fields (Optional)
+
+    CONSTRAINT [PK_FluidBalanceAdministration] PRIMARY KEY CLUSTERED 
+    (
+        [Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[FluidBalanceChart]    Script Date: 4/4/2025 2:31:48 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[FluidBalanceChart](
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+    [LabId] [int] NULL,
+    [PatientId] [int] NULL,
+    [Date] [date] NULL,
+    [IV_Fluids] [int] NULL,
+    [Oral_Intake] [int] NULL,
+    [Enteric_Intake] [int] NULL,
+    [Other_Fluids] [int] NULL,
+    [Cumulative_Intake] [int] NULL,
+    [Urine_Output] [int] NULL,
+    [Faecal_Output] [int] NULL,
+    [Vomitus] [int] NULL,
+    [Drainage] [int] NULL,
+    [Gastric_Aspirate] [int] NULL,
+    [Bladder_Scan] [int] NULL,
+    [Other_Output] [int] NULL,
+    [Cumulative_Output] [int] NULL,
+	[Difference] [int] NULL,
+
+    CONSTRAINT [PK_FluidBalanceChart] PRIMARY KEY CLUSTERED 
+    (
+        [Id] ASC
+) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+/****** Object:  Table [dbo].[NeurologicalAdministration]    Script Date: 6/5/2025 2:31:48 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[NeurologicalAdministration](
+    [Id] [int] IDENTITY(1,1) NOT NULL,
+	[LabId] [int] NULL,
+	[PatientId] [int] NULL,
+	[NeurologicalChartId] [int] NULL,
+	[StartDate] [date] NULL,
+	[StartTime] [varchar](50) NULL,
+	[EndDate] [date] NULL,
+	[EndTime] [varchar](50) NULL,
+	[PharmacistReview] [varchar](200) NULL,
+	[NurseSign] [varchar](50) NULL,
+	[CoSign] [varchar](50) NULL,
+
+    -- Signature Fields (Optional)
+
+    CONSTRAINT [PK_NeurologicalAdministration] PRIMARY KEY CLUSTERED 
+    (
+        [Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+/****** Object:  Table [dbo].[NeurologicalChart]    Script Date: 6/5/2025 2:31:48 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [dbo].[NeurologicalChart](
+    [Id] [int] IDENTITY(1,1) NOT NULL,
+    [LabId] [int] NULL,
+    [PatientId] [int] NULL,
+    [Date] [date] NULL,
+    [Time] [time] NULL,
+    [EyesOpenScore] [int] NULL,
+    [VerbalResponseScore] [varchar](1) NULL,  -- Supports 'T' for intubated
+    [MotorResponseScore] [int] NULL,
+    [TotalComaScale] [int] NULL,
+    [EndotrachealTube] [bit] NULL,
+    [RightPupilSize] [int] NULL,
+    [RightPupilReaction] [varchar](50) NULL,
+    [LeftPupilSize] [int] NULL,
+    [LeftPupilReaction] [varchar](50) NULL,
+    [ArmResponse] [varchar](50) NULL,
+    [LegResponse] [varchar](50) NULL,
+	[OfficerSign] [varchar](50) NULL,
+
+
+    CONSTRAINT [PK_NeurologicalChart] PRIMARY KEY CLUSTERED 
+    (
+        [Id] ASC
+    ) WITH (
+        PAD_INDEX = OFF, 
+        STATISTICS_NORECOMPUTE = OFF, 
+        IGNORE_DUP_KEY = OFF, 
+        ALLOW_ROW_LOCKS = ON, 
+        ALLOW_PAGE_LOCKS = ON, 
+        OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF
+    ) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+/*************Object_13/05/2025****/
+IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'NeurologicalObservationOptions')
+BEGIN
+    CREATE TABLE [dbo].[NeurologicalObservationOptions](
+        [Id] [int] IDENTITY(1,1) NOT NULL,
+        [category] [varchar](50) NOT NULL,
+        [value] [varchar](50) NOT NULL,
+        [description] [varchar](255) NULL,
+        CONSTRAINT [PK_NeurologicalObservationOptions] PRIMARY KEY CLUSTERED ([Id] ASC)
+    ) ON [PRIMARY]
+END
+GO
+
+
+-- Inserting options for Eyes Open Score (GCS - Eye Opening)
+INSERT INTO NeurologicalObservationOptions (category, value, description) VALUES
+('EyesOpenScore', '4', 'Spontaneously'),
+('EyesOpenScore', '3', 'To speech'),
+('EyesOpenScore', '2', 'To pain'),
+('EyesOpenScore', '1', 'Nil');
+
+-- Inserting options for Verbal Response Score (GCS - Verbal Response)
+INSERT INTO NeurologicalObservationOptions (category, value, description) VALUES
+('VerbalResponseScore', '5', 'Oriented'),
+('VerbalResponseScore', '4', 'Confused'),
+('VerbalResponseScore', '3', 'Inappropriate'),
+('VerbalResponseScore', '2', 'Incomprehensible'),
+('VerbalResponseScore', '1', 'Nil'),
+('VerbalResponseScore', 'T', 'Intubated');
+
+-- Inserting options for Motor Response Score (GCS - Motor Response)
+INSERT INTO NeurologicalObservationOptions (category, value, description) VALUES
+('MotorResponseScore', '6', 'Obeys commands'),
+('MotorResponseScore', '5', 'Localises to pain'),
+('MotorResponseScore', '4', 'Withdraws to pain'),
+('MotorResponseScore', '3', 'Abnormal flexion'),
+('MotorResponseScore', '2', 'Extensor'),
+('MotorResponseScore', '1', 'Nil');
+
+-- Inserting options for Pupil Reaction
+INSERT INTO NeurologicalObservationOptions (category, value, description) VALUES
+('PupilReaction', '+', 'reacts'),
+('PupilReaction', '-', 'no reaction');
+
+-- Inserting options for Pupil Size (in mm)
+INSERT INTO NeurologicalObservationOptions (category, value, description) VALUES
+('PupilSize', '1', '1 mm'),
+('PupilSize', '2', '2 mm'),
+('PupilSize', '3', '3 mm'),
+('PupilSize', '4', '4 mm'),
+('PupilSize', '5', '5 mm'),
+('PupilSize', '6', '6 mm'),
+('PupilSize', '7', '7 mm'),
+('PupilSize', '8', '8 mm');
+
+-- Inserting options for Endotracheal Tube status
+INSERT INTO NeurologicalObservationOptions (category, value, description) VALUES
+('EndotrachealTube', '0', 'No'),
+('EndotrachealTube', '1', 'Yes');
+
+-- Inserting options for Limb Movement for Arms and Legs
+INSERT INTO NeurologicalObservationOptions (category, value, description) VALUES
+('LimbMovement', 'Normal power', 'Normal strength and movement'),
+('LimbMovement', 'Mild weakness', 'Slight loss of strength or movement'),
+('LimbMovement', 'Severe weakness', 'Significant loss of strength or movement'),
+('LimbMovement', 'Spastic flexion', 'Involuntary flexion of the limb'),
+('LimbMovement', 'Extension', 'Involuntary extension of the limb'),
+('LimbMovement', 'No response', 'No movement or response to stimulus');
+
+GO
+
 /****** Object:  Table [dbo].[Lab]    Script Date: 20/10/2025 5:39:57 AM ******/
 SET ANSI_NULLS ON
 GO
@@ -439,6 +640,19 @@ BEGIN
     SET @RowsDeleted = @@ROWCOUNT;
     INSERT INTO @DeletedRowsSummary (TableName, RowsDeleted) VALUES ('Iv Fluid Chart', @RowsDeleted);
 
+    -- Delete from FluidBalanceChart
+    DELETE FROM [dbo].[FluidBalanceChart]
+    WHERE LabId = @LabId;
+    SET @RowsDeleted = @@ROWCOUNT;
+    INSERT INTO @DeletedRowsSummary (TableName, RowsDeleted) VALUES ('Fluid Balance Chart', @RowsDeleted);
+
+    -- Delete from NeurologicalChart
+    DELETE FROM [dbo].[NeurologicalChart]
+    WHERE LabId = @LabId;
+    SET @RowsDeleted = @@ROWCOUNT;
+    INSERT INTO @DeletedRowsSummary (TableName, RowsDeleted) VALUES ('Neurological Chart', @RowsDeleted);
+
+
     -- Delete from MedicationPrnChart
     DELETE FROM [dbo].[MedicationPrnChart]
     WHERE LabId = @LabId
@@ -462,6 +676,20 @@ BEGIN
     WHERE LabId = @LabId;
     SET @RowsDeleted = @@ROWCOUNT;
     INSERT INTO @DeletedRowsSummary (TableName, RowsDeleted) VALUES ('Student Iv Fluid', @RowsDeleted);
+
+
+    -- Delete from NeurologicalAdministration
+    DELETE FROM [dbo].[NeurologicalAdministration]
+    WHERE LabID = @LabId;
+    SET @RowsDeleted = @@ROWCOUNT;
+    INSERT INTO @DeletedRowsSummary (TableName, RowsDeleted) VALUES ('Student Neurological ', @RowsDeleted);
+
+    -- Delete from FluidBalanceAdministration
+    DELETE FROM [dbo].[FluidBalanceAdministration]
+    WHERE LabID = @LabId;
+    SET @RowsDeleted = @@ROWCOUNT;
+    INSERT INTO @DeletedRowsSummary (TableName, RowsDeleted) VALUES ('Student Fluid Balance ', @RowsDeleted);
+
 
     -- Delete from MedicationPrnAdministration
     DELETE FROM [dbo].[MedicationPrnAdministration]
@@ -522,7 +750,37 @@ BEGIN
     SET @RowsDeleted = @@ROWCOUNT;
     INSERT INTO @DeletedTables (TableName, RowsDeleted) VALUES ('Student Iv Fluid', @RowsDeleted);
 
-	-- Delete from MedicationPrnChart
+
+-- Delete from FluidBalanceAdministration and track rows affected
+     DELETE FROM [dbo].[FluidBalanceChart]
+     WHERE LabId = @LabId
+     AND PatientId = @PatientId;
+     SET @RowsDeleted = @@ROWCOUNT;
+     INSERT INTO @DeletedTables (TableName, RowsDeleted) VALUES ('Fluid Balance Chart', @RowsDeleted);
+
+     
+     DELETE FROM [dbo].[FluidBalanceAdministration]
+     WHERE LabId = @LabId
+     AND PatientId = @PatientId;
+     SET @RowsDeleted = @@ROWCOUNT;
+     INSERT INTO @DeletedTables (TableName, RowsDeleted) VALUES ('Student Fluid Balance', @RowsDeleted);
+
+	 
+ -- Delete from NeurologicalAdministration and track rows affected
+     DELETE FROM [dbo].[NeurologicalChart]
+     WHERE LabId = @LabId
+     AND PatientId = @PatientId;
+     SET @RowsDeleted = @@ROWCOUNT;
+     INSERT INTO @DeletedTables (TableName, RowsDeleted) VALUES ('Neurological Chart', @RowsDeleted);
+
+    DELETE FROM [dbo].[NeurologicalAdministration]
+    WHERE LabId = @LabId
+    AND PatientId = @PatientId;
+    SET @RowsDeleted = @@ROWCOUNT;
+    INSERT INTO @DeletedTables (TableName, RowsDeleted) VALUES ('Student Neurological', @RowsDeleted);
+
+
+-- Delete from MedicationPrnChart
     DELETE FROM [dbo].[MedicationPrnChart]
     WHERE LabId = @LabId
 	AND PatientId = @PatientId;
@@ -655,6 +913,107 @@ BEGIN
 END
 
 GO
+
+
+/****** Object:  StoredProcedure [dbo].[DeleteFluidBalanceAdministration]    Script Date: 4/4/2025 2:31:48 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[DeleteFluidBalanceAdministration]
+    @Id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DELETE FROM [dbo].[FluidBalanceAdministration]
+    WHERE Id = @Id;
+
+    -- Optionally, return the number of rows affected
+    SELECT @@ROWCOUNT AS RowsAffected;
+END
+GO
+/****** Object:  StoredProcedure [dbo].[DeleteFluidBalanceChart]    Script Date: 4/4/2025 2:31:48 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[DeleteFluidBalanceChart]
+    @Id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+	IF NOT EXISTS(SELECT 1 FROM FluidBalanceChart WHERE Id = @Id)
+    BEGIN
+        SELECT 0 AS RowsAffected, 'Fluid  Record does not exist' AS ResultMessage;
+    END
+    ELSE
+    BEGIN
+        IF EXISTS(SELECT 1 FROM FluidBalanceAdministration WHERE FluidBalanceChartId = @Id)
+        BEGIN
+            SELECT 0 AS RowsAffected, 'Fluid Record is being used in student Fluid Balance chart' AS ResultMessage;
+        END
+        ELSE
+        BEGIN
+            DELETE FROM FluidBalanceChart WHERE Id = @Id;
+
+            SELECT @@ROWCOUNT AS RowsAffected, 'Fluid Record deleted successfully' AS ResultMessage;
+        END
+    END
+END
+GO
+
+/****** Object:  StoredProcedure [dbo].[DeleteNeurologicalAdministration]    Script Date: 6/5/2025 2:31:48 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[DeleteNeurologicalAdministration]
+    @Id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DELETE FROM [dbo].[NeurologicalAdministration]
+    WHERE Id = @Id;
+
+    -- Optionally, return the number of rows affected
+    SELECT @@ROWCOUNT AS RowsAffected;
+END
+GO
+/****** Object:  StoredProcedure [dbo].[DeleteNeurologicalChart]    Script Date: 6/5/2025 2:31:48 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[DeleteNeurologicalChart]
+    @Id INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+	IF NOT EXISTS(SELECT 1 FROM NeurologicalChart WHERE Id = @Id)
+    BEGIN
+        SELECT 0 AS RowsAffected, 'Neurological Record does not exist' AS ResultMessage;
+    END
+    ELSE
+    BEGIN
+        IF EXISTS(SELECT 1 FROM NeurologicalAdministration WHERE NeurologicalChartId = @Id)
+        BEGIN
+            SELECT 0 AS RowsAffected, 'Neurological Record is being used in student Neurological chart' AS ResultMessage;
+        END
+        ELSE
+        BEGIN
+            DELETE FROM NeurologicalChart WHERE Id = @Id;
+
+            SELECT @@ROWCOUNT AS RowsAffected, 'Neurological Record deleted successfully' AS ResultMessage;
+        END
+    END
+END
+GO
+
+
 /****** Object:  StoredProcedure [dbo].[DeleteMedication]    Script Date: 20/10/2025 5:39:57 AM ******/
 SET ANSI_NULLS ON
 GO
@@ -807,6 +1166,25 @@ BEGIN
 
     DELETE FROM [dbo].[IvFluidAdministration]
 	WHERE LabId = @LabId
+    AND PatientId = @Id;
+
+
+-- Delete from FluidBalanceAdministration and track rows affected
+	DELETE FROM [dbo].[FluidBalanceChart]
+        WHERE LabId = @LabId
+    AND PatientId = @Id;
+
+    DELETE FROM [dbo].[FluidBalanceAdministration]
+        WHERE LabId = @LabId
+    AND PatientId = @Id;
+
+-- Delete from NeurologicalAdministration and track rows affected
+	DELETE FROM [dbo].[NeurologicalChart]
+        WHERE LabId = @LabId
+    AND PatientId = @Id;
+
+    DELETE FROM [dbo].[NeurologicalAdministration]
+        WHERE LabId = @LabId
     AND PatientId = @Id;
 
 	DELETE FROM [dbo].[MedicationPrnChart]
@@ -1099,6 +1477,139 @@ BEGIN
       AND (@PatientId = 0 OR PatientId = @PatientId)
       AND (@Id = 0 OR Id = @Id);
 END
+
+
+/****** Object:  StoredProcedure [dbo].[GetFluidBalanceAdministration]     ******/
+CREATE PROCEDURE [dbo].[GetFluidBalanceAdministration]
+    @LabId INT,
+    @PatientId INT,
+    @FluidBalanceChartId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        Id,
+        LabId,
+        PatientId,
+        FluidBalanceChartId,
+        StartDate,
+        StartTime,
+        EndDate,
+        EndTime,
+        VolGiven,
+        PharmacistReview,
+        NurseSign,
+		CoSign
+    FROM [dbo].[FluidBalanceAdministration]
+    WHERE LabId = @LabId 
+      AND PatientId = @PatientId
+      AND FluidBalanceChartId = @FluidBalanceChartId;
+END
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetFluidBlanceChart]   ******/
+CREATE PROCEDURE [dbo].[GetFluidBalanceChart]
+    @Id INT = 0,
+    @LabId INT = 0,
+    @PatientId INT = 0
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    
+    SELECT 
+        Id,
+        LabId,
+        PatientId,
+        [Date],
+        IV_Fluids,
+        Oral_Intake,
+        Enteric_Intake,
+        Other_Fluids,
+        Cumulative_Intake,
+        Urine_Output,
+        Faecal_Output,
+        Vomitus,
+        Drainage,
+        Gastric_Aspirate,
+        Bladder_Scan,
+        Other_Output,
+		[Difference],
+        Cumulative_Output
+		
+        
+    FROM [dbo].[FluidBalanceChart]
+    WHERE (@LabId = 0 OR LabId = @LabId) 
+      AND (@PatientId = 0 OR PatientId = @PatientId)
+      AND (@Id = 0 OR Id = @Id);
+END
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetNeurologicalAdministration]     ******/
+CREATE PROCEDURE [dbo].[GetNeurologicalAdministration]
+    @LabId INT,
+    @PatientId INT,
+    @NeurologicalChartId INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        Id,
+        LabId,
+        PatientId,
+        NeurologicalChartId,
+        StartDate,
+        StartTime,
+        EndDate,
+        EndTime,
+        PharmacistReview,
+        NurseSign,
+		CoSign
+    FROM [dbo].[NeurologicalAdministration]
+    WHERE LabId = @LabId 
+      AND PatientId = @PatientId
+      AND NeurologicalChartId = @NeurologicalChartId;
+END
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetNeurologicalChart]   ******/
+ 
+CREATE PROCEDURE [dbo].[GetNeurologicalChart]
+    @Id INT = 0,
+    @LabId INT = 0,
+    @PatientId INT = 0
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        Id,
+        LabId,
+        PatientId,
+        [Date],
+		[Time],
+		EyesOpenScore,
+		VerbalResponseScore,  -- Supports 'T' for intubated
+		MotorResponseScore,
+		TotalComaScale,
+		EndotrachealTube,
+		RightPupilSize,
+		RightPupilReaction,
+		LeftPupilSize,
+		LeftPupilReaction,
+		ArmResponse,
+		LegResponse,
+		OfficerSign
+        
+    FROM [dbo].[NeurologicalChart]
+    WHERE (@LabId = 0 OR LabId = @LabId) 
+      AND (@PatientId = 0 OR PatientId = @PatientId)
+      AND (@Id = 0 OR Id = @Id);
+END
+GO
+
 
 GO
 /****** Object:  StoredProcedure [dbo].[GetLab]    Script Date: 20/10/2025 5:39:57 AM ******/
@@ -1655,6 +2166,262 @@ BEGIN
 END
 
 GO
+
+
+	/****** Object:  StoredProcedure [dbo].[InsertFluidBalanceAdministration]    ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[InsertFluidBalanceAdministration]
+    @LabId INT,
+    @PatientId INT,
+    @FluidBalanceChartId INT,
+    @StartDate DATE,
+    @StartTime VARCHAR(50) = NULL,
+    @EndDate DATE,
+    @EndTime VARCHAR(50) = NULL,
+    @VolGiven VARCHAR(50) = NULL,
+    @PharmacistReview VARCHAR(200) = NULL,
+    @NurseSign VARCHAR(50) = NULL,
+	@CoSign VARCHAR(50) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO [dbo].[FluidBalanceAdministration]
+    (
+        LabId,
+        PatientId,
+        FluidBalanceChartId,
+        StartDate,
+        StartTime,
+        EndDate,
+        EndTime,
+        VolGiven,
+        PharmacistReview,
+        NurseSign,
+		CoSign
+    )
+    VALUES
+    (
+        @LabId,
+        @PatientId,
+        @FluidBalanceChartId,
+        @StartDate,
+        @StartTime,
+        @EndDate,
+        @EndTime,
+        @VolGiven,
+        @PharmacistReview,
+        @NurseSign,
+		@CoSign
+    );
+
+    -- Optionally return the newly inserted Id
+    SELECT CAST(SCOPE_IDENTITY() AS INT) AS Id;
+END
+GO
+/****** Object:  StoredProcedure [dbo].[InsertFluidBalanceChart]    ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[InsertFluidBalanceChart]
+    @LabId INT,
+    @PatientId INT,
+    @Date DATE,
+    @IV_Fluids VARCHAR(50) = NULL,
+    @Oral_Intake VARCHAR(50) = NULL,
+    @Enteric_Intake VARCHAR(50) = NULL,
+    @Other_Fluids VARCHAR(50) = NULL,
+    @Cumulative_Intake VARCHAR(50) = NULL,
+    @Urine_Output VARCHAR(50) = NULL,
+    @Faecal_Output VARCHAR(50) = NULL,
+    @Vomitus VARCHAR(50) = NULL,
+    @Drainage VARCHAR(50) = NULL,
+    @Gastric_Aspirate VARCHAR(50) = NULL,
+    @Bladder_Scan VARCHAR(50) = NULL,
+    @Other_Output VARCHAR(50) = NULL,
+    @Cumulative_Output VARCHAR(50) = NULL,
+	@Difference VARCHAR(50) = NULL
+    
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO [dbo].[FluidBalanceChart]
+    (
+        LabId,
+        PatientId,
+        [Date],
+        IV_Fluids,
+        Oral_Intake,
+        Enteric_Intake,
+        Other_Fluids,
+        Cumulative_Intake,
+        Urine_Output,
+        Faecal_Output,
+        Vomitus,
+        Drainage,
+        Gastric_Aspirate,
+        Bladder_Scan,
+        Other_Output,
+        Cumulative_Output,
+		[Difference]
+        
+    )
+    VALUES
+    (
+        @LabId,
+        @PatientId,
+        @Date,
+        @IV_Fluids,
+        @Oral_Intake,
+        @Enteric_Intake,
+        @Other_Fluids,
+        @Cumulative_Intake,
+        @Urine_Output,
+        @Faecal_Output,
+        @Vomitus,
+        @Drainage,
+        @Gastric_Aspirate,
+        @Bladder_Scan,
+        @Other_Output,
+        @Cumulative_Output,
+		@Difference
+       
+    );
+	    -- Optionally return the newly inserted Id
+     SELECT CAST(SCOPE_IDENTITY() AS INT) AS Id;
+END
+GO
+
+		/****** Object:  StoredProcedure [dbo].[InsertNeurologicalAdministration]    ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[InsertNeurologicalAdministration]
+    @LabId INT,
+    @PatientId INT,
+    @NeurologicalChartId INT,
+    @StartDate DATE,
+    @StartTime VARCHAR(50) = NULL,
+    @EndDate DATE,
+    @EndTime VARCHAR(50) = NULL,
+    @PharmacistReview VARCHAR(200) = NULL,
+    @NurseSign VARCHAR(50) = NULL,
+	@CoSign VARCHAR(50) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO [dbo].[NeurologicalAdministration]
+    (
+        LabId,
+        PatientId,
+        NeurologicalChartId,
+        StartDate,
+        StartTime,
+        EndDate,
+        EndTime,
+        PharmacistReview,
+        NurseSign,
+		CoSign
+    )
+    VALUES
+    (
+        @LabId,
+        @PatientId,
+        @NeurologicalChartId,
+        @StartDate,
+        @StartTime,
+        @EndDate,
+        @EndTime,
+        @PharmacistReview,
+        @NurseSign,
+		@CoSign
+    );
+
+    -- Optionally return the newly inserted Id
+    SELECT CAST(SCOPE_IDENTITY() AS INT) AS Id;
+END
+GO
+/****** Object:  StoredProcedure [dbo].[InsertNeurologicalChart]    ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [dbo].[InsertNeurologicalChart]
+    @LabId INT,
+    @PatientId INT,
+	@Date DATE,
+    @Time TIME,
+    @EyesOpenScore INT NULL,
+    @VerbalResponseScore VARCHAR(1) = NULL,  -- Supports 'T' for intubated
+    @MotorResponseScore INT NULL,
+    @TotalComaScale INT NULL,
+    @EndotrachealTube BIT NULL,
+    @RightPupilSize INT NULL,
+    @RightPupilReaction VARCHAR(50) = NULL,
+    @LeftPupilSize INT NULL,
+    @LeftPupilReaction VARCHAR(50) = NULL,
+    @ArmResponse VARCHAR(50) = NULL,
+    @LegResponse VARCHAR(50) = NULL,
+	@OfficerSign VARCHAR(50) = NULL
+   
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO [dbo].[NeurologicalChart]
+    (
+        LabId,   
+		PatientId,
+		[Date],
+		[Time],
+		EyesOpenScore,
+		VerbalResponseScore,  -- Supports 'T' for intubated
+		MotorResponseScore,
+		TotalComaScale,
+		EndotrachealTube,
+		RightPupilSize,
+		RightPupilReaction,
+		LeftPupilSize,
+		LeftPupilReaction,
+		ArmResponse,
+		LegResponse,
+		OfficerSign
+
+    )
+    VALUES
+    (
+		@LabId,
+		@PatientId,
+		@Date,
+		@Time,
+		@EyesOpenScore,
+		@VerbalResponseScore,  -- Supports 'T' for intubated
+		@MotorResponseScore,
+		@TotalComaScale,
+		@EndotrachealTube,
+		@RightPupilSize,
+		@RightPupilReaction,
+		@LeftPupilSize,
+		@LeftPupilReaction,
+		@ArmResponse,
+		@LegResponse,
+		@OfficerSign
+    );
+	    -- Optionally return the newly inserted Id
+    SELECT CAST(SCOPE_IDENTITY() AS INT) AS Id;
+END
+GO
+
+
+
+
 /****** Object:  StoredProcedure [dbo].[InsertMedication]    Script Date: 20/10/2025 5:39:57 AM ******/
 SET ANSI_NULLS ON
 GO
